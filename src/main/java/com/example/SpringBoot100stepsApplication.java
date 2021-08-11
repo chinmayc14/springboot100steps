@@ -6,7 +6,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @SpringBootApplication
 public class SpringBoot100stepsApplication {
 
-	// S
+	// Step1
 	public static void main(String[] args) {
 		SpringApplication.run(SpringBoot100stepsApplication.class, args);
 	}
