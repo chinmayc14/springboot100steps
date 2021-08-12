@@ -7,6 +7,8 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.Size;
 
 @Entity
 @Table(name = "users")
@@ -22,9 +24,11 @@ public class UserModel implements Serializable {
 	@Column(name = "id", nullable = false)
 	private int id;
 
+	@NotEmpty(message = "no")
 	@Column(name = "username", nullable = false, length = 50)
 	private String username;
 
+	@Size(min = 2, message = "firstname should have min 2 characters")
 	@Column(name = "firstname", nullable = false, length = 50)
 	private String firstName;
 	@Column(name = "lastname", nullable = false, length = 50)

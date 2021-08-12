@@ -3,10 +3,14 @@ package com.example.ui.controllers;
 import java.util.List;
 import java.util.Optional;
 
+import javax.validation.Valid;
+import javax.validation.constraints.Min;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -19,12 +23,14 @@ import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import com.example.exeptions.UserExistsException;
+import com.example.exeptions.UserNameNotFoundException;
 import com.example.exeptions.UserNotFoundException;
 import com.example.services.UserService;
 import com.example.ui.models.UserModel;
 
 @RestController
 @RequestMapping("/users")
+@Validated
 public class UserController {
 
 	UserService userService;
@@ -40,7 +46,7 @@ public class UserController {
 	}
 
 	@PostMapping
-	public ResponseEntity<UserModel> createUser(@RequestBody UserModel user, UriComponentsBuilder uriBuilder)
+	public ResponseEntity<UserModel> createUser(@Valid @RequestBody UserModel user, UriComponentsBuilder uriBuilder)
 			throws Exception {
 		try {
 			UserModel createdUser;
@@ -54,7 +60,7 @@ public class UserController {
 	}
 
 	@GetMapping("/{id}")
-	public Optional<UserModel> getUserById(@PathVariable int id) {
+	public Optional<UserModel> getUserById(@PathVariable @Min(1) int id) {
 		try {
 			return userService.getUserById(id);
 		} catch (UserNotFoundException ex) {
@@ -80,8 +86,12 @@ public class UserController {
 	}
 
 	@GetMapping("/byusername/{username}")
-	public UserModel getUserById(@PathVariable String username) {
-		return userService.getUserByUsername(username);
+	public UserModel getUserById(@PathVariable String username) throws Exception {
+		UserModel foundUser = userService.getUserByUsername(username);
+		if (foundUser == null) {
+			throw new UserNameNotFoundException("User with given username does not exists");
+		}
+		return foundUser;
 
 	}
 }
