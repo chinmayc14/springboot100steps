@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -14,7 +15,11 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
+import org.springframework.web.util.UriComponentsBuilder;
 
+import com.example.exeptions.UserExistsException;
+import com.example.exeptions.UserNotFoundException;
 import com.example.services.UserService;
 import com.example.ui.models.UserModel;
 
@@ -35,21 +40,37 @@ public class UserController {
 	}
 
 	@PostMapping
-	public ResponseEntity<UserModel> createUser(@RequestBody UserModel user) {
-		UserModel createdUser = userService.createUser(user);
-		return ResponseEntity.status(HttpStatus.CREATED).body(createdUser);
+	public ResponseEntity<UserModel> createUser(@RequestBody UserModel user, UriComponentsBuilder uriBuilder)
+			throws Exception {
+		try {
+			UserModel createdUser;
+			createdUser = userService.createUser(user);
+			HttpHeaders headers = new HttpHeaders();
+			headers.setLocation(uriBuilder.path("/users/{id}").buildAndExpand(user.getId()).toUri());
+			return new ResponseEntity<>(createdUser, headers, HttpStatus.CREATED);
+		} catch (UserExistsException e) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
+		}
 	}
 
 	@GetMapping("/{id}")
-	public UserModel getUserById(@PathVariable int id) {
-		Optional<UserModel> checkNull = userService.getUserById(id);
-		return checkNull.orElseGet(UserModel::new);
+	public Optional<UserModel> getUserById(@PathVariable int id) {
+		try {
+			return userService.getUserById(id);
+		} catch (UserNotFoundException ex) {
+			throw new ResponseStatusException(HttpStatus.NOT_FOUND, ex.getMessage());
+		}
+
 	}
 
 	@PutMapping("/{id}")
-	public UserModel updateUser(@RequestBody UserModel user) {
-		UserModel updatedUser = userService.updateUser(user);
-		return updatedUser;
+	public UserModel updateUser(@RequestBody UserModel user, @PathVariable int id) throws Exception {
+		try {
+			UserModel updatedUser = userService.updateUser(user, id);
+			return updatedUser;
+		} catch (Exception ex) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ex.getMessage());
+		}
 	}
 
 	@DeleteMapping("/{id}")
