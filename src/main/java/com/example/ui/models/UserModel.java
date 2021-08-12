@@ -1,11 +1,13 @@
 package com.example.ui.models;
 
 import java.io.Serializable;
+import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
@@ -43,6 +45,9 @@ public class UserModel implements Serializable {
 	@Column(name = "ssn", nullable = false, unique = true)
 	private Long ssn;
 
+	@OneToMany(mappedBy = "user")
+	private List<OrderModel> orders;
+
 	public UserModel(int id, String username, String firstName, String lastName, String email, String role, Long ssn) {
 		this.id = id;
 		this.username = username;
@@ -56,7 +61,7 @@ public class UserModel implements Serializable {
 	@Override
 	public String toString() {
 		return "UserModel [id=" + id + ", username=" + username + ", firstName=" + firstName + ", lastName=" + lastName
-				+ ", email=" + email + ", role=" + role + ", ssn=" + ssn + "]";
+				+ ", email=" + email + ", role=" + role + ", ssn=" + ssn + ", orders=" + orders + "]";
 	}
 
 	public UserModel() {
@@ -116,6 +121,14 @@ public class UserModel implements Serializable {
 
 	public void setUsername(String username) {
 		this.username = username;
+	}
+
+	public List<OrderModel> getOrders() {
+		return orders;
+	}
+
+	public void setOrders(List<OrderModel> orders) {
+		this.orders = orders;
 	}
 
 }
