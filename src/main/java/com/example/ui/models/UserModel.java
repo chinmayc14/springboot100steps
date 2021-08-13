@@ -1,6 +1,5 @@
 package com.example.ui.models;
 
-import java.io.Serializable;
 import java.util.List;
 
 import javax.persistence.Column;
@@ -12,14 +11,11 @@ import javax.persistence.Table;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
 
+import org.springframework.hateoas.RepresentationModel;
+
 @Entity
 @Table(name = "users")
-public class UserModel implements Serializable {
-
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = -8977315337460837419L;
+public class UserModel extends RepresentationModel<UserModel> {
 
 	@Id
 	@GeneratedValue

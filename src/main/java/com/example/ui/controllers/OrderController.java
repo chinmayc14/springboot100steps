@@ -51,7 +51,7 @@ public class OrderController {
 	}
 
 	@GetMapping("/{userId}/orders/{orderId}")
-	public OrderModel getUserById(@PathVariable int userId, @PathVariable int orderId) {
+	public OrderModel getOrderById(@PathVariable int userId, @PathVariable int orderId) {
 		try {
 			UserModel user = userRepository.findById(userId)
 					.orElseThrow((() -> new UserNotFoundException("User Not Found")));
